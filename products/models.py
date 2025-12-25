@@ -28,6 +28,43 @@ class ProductsListingPage(Page):
             path__startswith=self.path
         ).order_by('title')
         context['categories'] = categories
+        
+        # Get all products for search functionality
+        all_products = ProductPage.objects.live().public().filter(
+            path__startswith=self.path
+        ).select_related('image').order_by('title')
+        
+        # Prepare product data for JavaScript
+        import json
+        from django.utils.html import strip_tags
+        
+        products_data = []
+        for product in all_products:
+            # Extract plain text from RichTextField
+            description_text = ''
+            if product.description:
+                if hasattr(product.description, 'source'):
+                    # It's a RichText object
+                    description_text = strip_tags(str(product.description))
+                elif hasattr(product.description, 'plain_text'):
+                    # It has plain_text method
+                    description_text = product.description.plain_text()
+                else:
+                    # It's already a string or can be converted
+                    description_text = strip_tags(str(product.description))
+            
+            products_data.append({
+                'id': product.id,
+                'title': product.title,
+                'price': str(product.price),
+                'description': description_text,
+                'sku': product.sku or '',
+                'url': product.url,
+                'category': product.get_parent().title if product.get_parent() else '',
+                'image_url': product.image.file.url if product.image and product.image.file else '',
+            })
+        
+        context['all_products_json'] = json.dumps(products_data)
         return context
     
     def clean(self):

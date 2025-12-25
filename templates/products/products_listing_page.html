@@ -12,6 +12,23 @@
             </div>
         {% endif %}
     </div>
+
+    <!-- Product Search Section -->
+    <div class="product-search-section" style="margin-top: 4rem;">
+        <div class="content">
+            <h2 style="margin-bottom: var(--spacing-lg);">Search All Products</h2>
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    id="product-search-input" 
+                    class="search-input" 
+                    placeholder="Search products by name, description, or SKU..."
+                    autocomplete="off"
+                />
+                <div id="search-results" class="search-results"></div>
+            </div>
+        </div>
+    </div>
     
     <div class="product-grid" style="margin-top: 3rem;">
         {% for category in categories %}
@@ -42,6 +59,98 @@
             </div>
         {% endfor %}
     </div>
+    
 </div>
+
+<script>
+    // Eagerly load all products data
+    const allProducts = {{ all_products_json|safe }};
+    
+    // Search functionality
+    const searchInput = document.getElementById('product-search-input');
+    const searchResults = document.getElementById('search-results');
+    
+    function searchProducts(query) {
+        if (!query || query.trim().length === 0) {
+            searchResults.innerHTML = '';
+            searchResults.style.display = 'none';
+            return;
+        }
+        
+        const searchTerm = query.toLowerCase().trim();
+        const filtered = allProducts.filter(product => {
+            const titleMatch = product.title.toLowerCase().includes(searchTerm);
+            const descriptionMatch = product.description.toLowerCase().includes(searchTerm);
+            const skuMatch = product.sku.toLowerCase().includes(searchTerm);
+            const categoryMatch = product.category.toLowerCase().includes(searchTerm);
+            
+            return titleMatch || descriptionMatch || skuMatch || categoryMatch;
+        });
+        
+        displayResults(filtered, searchTerm);
+    }
+    
+    function displayResults(products, searchTerm) {
+        if (products.length === 0) {
+            searchResults.innerHTML = `
+                <div class="search-no-results">
+                    <p>No products found matching "${searchTerm}"</p>
+                </div>
+            `;
+            searchResults.style.display = 'block';
+            return;
+        }
+        
+        let html = '<div class="search-results-grid">';
+        
+        products.forEach(product => {
+            const imageHtml = product.image_url 
+                ? `<img src="${product.image_url}" alt="${product.title}" class="search-result-image" />`
+                : `<div class="search-result-image-placeholder">No Image</div>`;
+            
+            html += `
+                <div class="search-result-card">
+                    <a href="${product.url}" class="search-result-link">
+                        ${imageHtml}
+                        <div class="search-result-info">
+                            <h4 class="search-result-title">${escapeHtml(product.title)}</h4>
+                            <p class="search-result-category">${escapeHtml(product.category)}</p>
+                            <p class="search-result-price">$${product.price}</p>
+                            ${product.sku ? `<p class="search-result-sku">SKU: ${escapeHtml(product.sku)}</p>` : ''}
+                        </div>
+                    </a>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        searchResults.innerHTML = html;
+        searchResults.style.display = 'block';
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Debounce search for better performance
+    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchProducts(e.target.value);
+        }, 150);
+    });
+    
+    // Hide results when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            if (searchInput.value.trim().length === 0) {
+                searchResults.style.display = 'none';
+            }
+        }
+    });
+</script>
 {% endblock %}
 
