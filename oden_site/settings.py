@@ -184,6 +184,14 @@ WAGTAIL_SITE_NAME = "ODENN Outdoor Products"
 BASE_URL = os.environ.get('BASE_URL', 'http://localhost:8000')
 WAGTAILADMIN_BASE_URL = os.environ.get('WAGTAILADMIN_BASE_URL', BASE_URL)
 
+# CSRF trusted origins for Railway
+# Use BASE_URL if it's HTTPS, otherwise derive from ALLOWED_HOSTS
+if BASE_URL.startswith('https://'):
+    CSRF_TRUSTED_ORIGINS = [BASE_URL]
+else:
+    # Build from ALLOWED_HOSTS
+    CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if host != '*']
+
 # Static site generation settings
 BAKERY_VIEWS = (
     'wagtailbakery.views.AllPublishedPagesView',
@@ -197,8 +205,12 @@ BUILD_DIR = os.path.join(BASE_DIR, 'build')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Security settings for production
+# Railway handles SSL termination at the edge, so we trust their proxy
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # Don't force SSL redirect - Railway handles this at the edge
+    SECURE_SSL_REDIRECT = False
+    # Trust Railway's proxy headers for SSL
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
