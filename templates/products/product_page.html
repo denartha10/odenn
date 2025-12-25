@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 4rem;">
+<div class="product-detail-page">
+    <!-- Product Details -->
+    <div class="product-detail-section">
+        <div class="product-detail-content">
+            <div class="product-detail-image">
+                {% if page.image %}
+                    {% image page.image width-800 %}
+                {% endif %}
+            </div>
+            <div class="product-detail-info">
+                <h1>{{ page.title }}</h1>
+                {% if page.sku %}
+                    <p class="product-sku">SKU: {{ page.sku }}</p>
+                {% endif %}
+                <div class="product-price-large">${{ page.price }}</div>
+                
+                <div class="product-actions">
+                    <a href="/contact/" class="btn btn-primary btn-large">Contact for Quote</a>
+                    {% if page.specification_pdf %}
+                        <a href="{{ page.specification_pdf.url }}" class="btn btn-secondary btn-large" target="_blank" download>
+                            Download Product Specification (PDF)
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        {% if page.description %}
+            <div class="product-description">
+                <h2>Product Description</h2>
+                <div class="description-content">
+                    {{ page.description|richtext }}
+                </div>
+            </div>
+        {% endif %}
+        
+        <div class="back-link">
+            <a href="{% pageurl page.get_parent %}" class="btn btn-secondary">← Back to Products</a>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

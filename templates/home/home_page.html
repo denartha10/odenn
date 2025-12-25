@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<!-- Hero Section -->
+{% if page.hero_background %}
+    {% image page.hero_background width-1920 as hero_img %}
+    <div class="hero hero-with-image" style="background-image: url('{{ hero_img.url }}');">
+{% else %}
+    <div class="hero">
+{% endif %}
+    <div class="hero-content">
+        <h1>{% if page.title %}{{ page.title }}{% else %}Premium Outdoor Products{% endif %}</h1>
+        {% if page.intro %}
+            <p class="subheading">{{ page.intro|striptags|truncatewords:30 }}</p>
+        {% else %}
+            <p class="subheading">Discover our premium collection of bike racks and outdoor solutions designed for durability and style.</p>
+        {% endif %}
+        <div class="hero-actions">
+            <a href="/products/" class="btn btn-primary btn-large">View Products</a>
+            <a href="/contact/" class="btn btn-secondary btn-large">Get in Touch</a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Section -->
+<div class="container" style="padding-top: 4rem; padding-bottom: 4rem;">
+    <div class="content">
+        {% if page.body %}
+            <div class="body-content">
+                {% for block in page.body %}
+                    {% if block.block_type == 'heading' %}
+                        <h2>{{ block.value }}</h2>
+                    {% elif block.block_type == 'paragraph' %}
+                        <div>{{ block.value|richtext }}</div>
+                    {% elif block.block_type == 'image' %}
+                        <div style="margin: 2rem 0;">
+                            {% image block.value width-1200 %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
