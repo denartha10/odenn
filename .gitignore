@@ -48,3 +48,7 @@ Thumbs.db
 
 # Build directory
 /build/
+
+# Data exports (may contain sensitive data)
+# local_data.json  # Temporarily uncommented for Railway import
+*.json.bak
