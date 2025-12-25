@@ -53,3 +53,6 @@ Thumbs.db
 local_data.json
 pages_only.json
 *.json.bak
+
+# CSV files (example files can be committed, but user data should not)
+# products_example.csv  # Keep example file

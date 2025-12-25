@@ -1,0 +1,56 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n %}
+
+{% block titletag %}Import Products from CSV{% endblock %}
+
+{% block content %}
+    <header class="nice-padding">
+        <div class="row">
+            <div class="left">
+                <div class="col">
+                    <h1 class="icon icon-download">Import Products from CSV</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="nice-padding">
+        <div class="help-block help-info">
+            <p><strong>CSV Format Required:</strong></p>
+            <p>Your CSV file must have these columns: <code>product_category</code>, <code>product</code>, <code>price</code></p>
+            <p><strong>Example:</strong></p>
+            <pre>product_category,product,price
+Cycle Parking,Premium Two-Tier Cycle Rack,299.99
+Cycle Parking,Standard Cycle Rack,149.99
+Cycle Hubs,Secure Cycle Hub,599.99</pre>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <ul class="fields">
+                <li>
+                    <label for="id_csv_file">CSV File:</label>
+                    <input type="file" name="csv_file" id="id_csv_file" accept=".csv" required>
+                    <p class="help">Select a CSV file with product data</p>
+                </li>
+            </ul>
+            <div class="actions">
+                <button type="submit" class="button button-longrunning" data-clicked-text="Importing...">
+                    <span class="icon icon-spinner"></span>
+                    <em>Import Products</em>
+                </button>
+            </div>
+        </form>
+
+        <div class="help-block help-warning" style="margin-top: 2rem;">
+            <p><strong>Note:</strong></p>
+            <ul>
+                <li>Categories will be created automatically if they don't exist</li>
+                <li>Products with the same name in the same category will be updated (not duplicated)</li>
+                <li>Prices must be numeric (e.g., 199.99)</li>
+                <li>All imported products will be published automatically</li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+

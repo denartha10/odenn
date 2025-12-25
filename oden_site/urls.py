@@ -6,9 +6,11 @@ from django.contrib import admin
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
+from products.admin import import_products_csv
 
 urlpatterns = [
     path('django-admin/', admin.site.urls),
+    path('admin/products/import-csv/', import_products_csv, name='import_products_csv'),
     path('admin/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
     path('', include(wagtail_urls)),
