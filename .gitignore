@@ -51,4 +51,5 @@ Thumbs.db
 
 # Data exports (may contain sensitive data)
 # local_data.json  # Temporarily uncommented for Railway import
+.data_imported
 *.json.bak
